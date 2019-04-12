@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.collabration.dao.FriendDAO;
+import com.collabration.dao.NotificationDAO;
 import com.collabration.dao.UserDAO;
 import com.collabration.model.ErrorClazz;
 import com.collabration.model.Friend;
+import com.collabration.model.Notification;
 import com.collabration.model.User;
 
 @RestController
@@ -27,6 +29,9 @@ public class FriendController {
 	
 	@Autowired
 	UserDAO userDAO;
+	
+	@Autowired
+	NotificationDAO notificationDAO;
 	
 	@RequestMapping(value="/suggestedusers",method=RequestMethod.GET)
 	public ResponseEntity<?> getSuggestedUsers(HttpSession session){
@@ -88,6 +93,15 @@ public class FriendController {
 		
 		friend.setStatus('A');
 		friendDAO.acceptRequest(friend);
+
+		Notification notification=new Notification();
+		notification.setBlogTitle("Friend Request Accepted !");
+		notification.setApprovalStatus("A");
+		notification.setEmail(friend.getFromId().getEmail());
+		notification.setViewed(false);
+		
+		
+		notificationDAO.addNotification(notification);
 		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 	
